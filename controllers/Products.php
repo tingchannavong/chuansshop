@@ -252,44 +252,44 @@ class Products extends CI_Controller {
         $this->form_validation->set_rules('name_id', 'name', 'required');
         $this->form_validation->set_rules('cost', 'cost', 'required');
         $this->form_validation->set_rules('price', 'price', 'required');
-
+    
         if ($this->form_validation->run() == FALSE) {
             // return validation errors in json format
             $array = array(
-                'error'   => true,
-                'name_error' => form_error('name'),
-                'email_error' => form_error('email'),
-                'subject_error' => form_error('subject'),
-                'message_error' => form_error('message')
+                'error' => true,
+                'name_error' => form_error('name_id'),
+                'barcode_error' => form_error('barcode'),
+                'cost_error' => form_error('cost'),
+                'price_error' => form_error('price'),
             );
-
             echo json_encode($array);
-        } else {
-            // Prepare data to insert into the database
-            $data = array(
-                'barcode' => $this->input->post('barcode'),
-                'product_id' => $this->input->post('name_id'),
-                'category_id' => $this->input->post('category'),
-                'brand_id' => $this->input->post('brand'),
-                'cost' => $this->input->post('cost'),
-                'price' => $this->input->post('price'),
-
-            );
-
+            return;
+        }
+    
+        // Prepare data to insert into the database
+        $data = array(
+            'barcode' => $this->input->post('barcode'),
+            'product_id' => $this->input->post('name_id'),
+            'category_id' => $this->input->post('category'),
+            'brand_id' => $this->input->post('brand'),
+            'cost' => $this->input->post('cost'),
+            'price' => $this->input->post('price'),
+        );
+    
+        // Insert data using the model
+        if ($this->Product_model->insert_item($data)) {
             echo json_encode([
                 'status' => 'success',
                 'message' => 'Form submitted successfully!'
             ]);
-
-            // Insert data using the model
-            if ($this->Product_model->insert_item($data)) {
-                $this->session->set_flashdata('success', 'Success!');
-                redirect('products/variants');
-            } else {
-                $this->session->set_flashdata('error', 'Failed to add. Try again.');
-                $this->load->view('products/add_item');
-            }
+        } else {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Insert failed!'
+            ]);
         }
+    
+        return;
     }
 
     public function displayitems() {

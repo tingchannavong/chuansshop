@@ -225,61 +225,55 @@
                 <button name="submit" type="submit" class="btn btn-warning">Next</button>
             </div>
             <div class="col-md-3">
-                <button type="button" onclick="window.location.href='<?php echo site_url('products/displayitems'); ?>'" class="btn btn-danger">Cancel</button>
+                <button id="cancelBtn" onclick="window.location.href='<?php echo site_url('products/displayitems'); ?>'" type="button" class="btn btn-danger">Cancel</button>
+                <button id="redirect" type="button" class="btn btn-danger">Redirect</button>
+
             </div>
         </div>
         </form>
-
-        <div id="message"></div> <!-- This will show success or error messages -->
 
         <canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas>
 
         </main>
 
     <script type="text/javascript">
-    $(document).ready( function() {
-    $("#new_item_form").on('submit', function(event){
-      event.preventDefault();
-      $.ajax({
-        url: "<?= base_url('products/item_submit'); ?>",
-        method: "POST",
-        data: $(this).serialize(),
-        dataType: "json",
-        beforeSend: function() {
-            $('#submit').attr('disabled', 'disabled');
-            },
-        success: function (response) {
-          if (response.error) {
-            if (response.barcode_error != '') {
-              $('#barcode_error').html(response.barcode_error);
-            } else {
-              $('#barcode_error').html('');
-            } if (response.name_error != '') {
-              $('#name_error').html(response.name_error);
-            } else {
-              $('#name_error').html('');
-            } if (response.cost_error != '') {
-              $('#cost_error').html(response.cost_error);
-            } else {
-              $('#cost_error').html('');
-            } if (response.price_error != '') {
-              $('#price_error').html(response.price_error);
-            } else {
-              $('#price_error').html('');
-            } if (response.success) {
-            $('#success_message').html(response.success);
-            $('#name_error').html('');
-            $('#cost_error').html('');
-            $('#price_error').html('');
-            $('#new_item_form')[0].reset();
-            }
-            $('#submit').attr('disabled', false);
-            }
-          }
-      });
+        $(document).ready(function () {
+    $('#redirect').on("click", function (event) {
+      window.location.assign("<?= site_url('products/displayitems'); ?>");
     });
-  });
-    
+
+    $("#new_item_form").on('submit', function (event) {
+        event.preventDefault(); // Prevent regular form submission
+
+        $.ajax({
+            url: "<?= base_url('products/item_submit'); ?>",
+            type: 'POST',
+            data: $(this).serialize(),
+            dataType: 'json', // tells jQuery to parse the response as JSON
+            success: function (response) {
+                if (response.status === "success") {
+                  window.location.assign("<?= site_url('products/displayitems'); ?>");
+                  console.log("success");
+                } else if (response.error) {
+                    $('#barcode_error').html(response.barcode_error || '');
+                    $('#name_error').html(response.name_error || '');
+                    $('#cost_error').html(response.cost_error || '');
+                    $('#price_error').html(response.price_error || '');
+
+                    if (response.message) {
+                        alert(response.message);
+                    }
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("AJAX error:", error);
+                console.error("Response:", xhr.responseText);
+                alert("500 Server Error. Check browser console for details.");
+            }
+        });
+    });
+});
+
     </script>
 
     <script src="<?php base_url('assets/js/bootstrap.bundle.min.js') ?>"></script>
