@@ -13,6 +13,9 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
 
+    <!-- jquery plugin  -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
 <link href="<?php echo base_url().'assets/css/bootstrap.min.css'; ?>" rel="stylesheet">
 
     <style>
@@ -163,24 +166,34 @@
         <!-- Call to open form via controller_name/function -->
         <?php echo form_open('products/variant_submit'); ?>
 
-        <form>
+        <form id="variant_form">
         <div class="row g-3">
-            <div class="col-lg-2">
+            <div class="col-lg-12">
                 <label for="var_id" class="form-label">Variant ID</label>
                 <input name="var_id" type="text" class="form-control" id="inputvarID">
                 <?php echo form_error('var_id'); ?>
             </div>
             <div class="col-lg-3">
-                <label for="barcode" class="form-label">Name</label>
-                <select name="barcode">
-                    <option value="">Select Name</option>
-                    <?php foreach ($names as $name): ?>
-                        <option value="<?= $name->barcode ?>"><?= $name->product_name ?></option>
+                <label for="barcode" class="form-label">Barcode</label>
+                <select id="barcodeSelect" name="barcode">
+                    <option value="">Select Barcode</option>
+                    <?php foreach ($barcodes as $barcode): ?>
+                        <option value="<?= $barcode->barcode ?>"><?= $barcode->barcode ?></option>
                     <?php endforeach; ?>
                 </select>
                 <?php echo form_error('barcode'); ?>
             </div>
             <div class="col-lg-3">
+              <span id="selectedName">Product Name: ...</span>
+            </div>
+            <div class="col-lg-3">
+              <span id="selectedCategory">Category: ...</span>
+            </div>
+            <div class="col-lg-3">
+              <span id="selectedBrand">Brand: ...</span>
+            </div>
+
+            <div class="col-lg-12">
                 <label for="color" class="form-label">Color</label>
                 <select name="color">
                     <option value="">Select Color</option>
@@ -190,7 +203,7 @@
                 </select>
                 <?php echo form_error('color'); ?>
             </div>
-            <div class="col-lg-3">
+            <div class="col-lg-12">
                 <label for="size" class="form-label">Size</label>
                 <select name="size">
                     <option value="">Select Size</option>
@@ -200,7 +213,7 @@
                 </select>
                 <?php echo form_error('size'); ?>
             </div>
-            <div class="col-lg-4">
+            <div class="col-lg-2">
                 <label for="quantity" class="form-label">Quantity</label>
                 <input name="quantity" type="text" class="form-control" id="inputqty">
                 <?php echo form_error('quantity'); ?>
@@ -222,10 +235,46 @@
         </main>
 
         <script src="<?php base_url('assets/js/bootstrap.bundle.min.js') ?>"></script>
-        <!-- <script src="../assets/js/bootstrap.bundle.min.js"></script> -->
 
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.2/dist/chart.umd.js" integrity="sha384-eI7PSr3L1XLISH8JdDII5YN/njoSsxfbrkCTnJrzXt+ENP5MOVBxD+l6sEG4zoLp" crossorigin="anonymous"></script>
         <script src="<?php base_url('assets/js/dashboard.js') ?>"></script>
+
+        <script>
+          $(document).ready(function () {
+
+            $("#barcodeSelect").on('change', function () {
+              var selectedValue = $(this).val();
+              console.log('Selected value', selectedValue);
+
+              $.ajax({
+                type: "POST",
+                url: "<?= base_url('products/get_product_details'); ?>",
+                dataType: "json",
+                data: {barcode: selectedValue},
+                success: function (data) {
+                  console.log(data);
+                  if (data.error) {
+                    alert(data.error);
+                  } else {
+                    // update data to html page
+                    console.log(data.product_name);
+                    $('#selectedName').text(`Product Name: ${data.name}`);
+                    $('#selectedCategory').text(`Category Name: ${data.category}`);
+                    $('#selectedBrand').text(`Brand Name: ${data.brand}`);
+                  }
+                },
+                error: function (xhr, status, error) {
+                console.error("AJAX error:", error);
+                console.error("Response:", xhr.responseText);
+                alert("500 Server Error. Check browser console for details.");
+            }
+
+              });
+
+            });
+
+          });
+        </script>
 
         </body>
 </html>
