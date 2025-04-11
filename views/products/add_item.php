@@ -163,8 +163,6 @@
         <?php elseif ($this->session->flashdata('error')): ?>
             <p style="color: red;"><?php echo $this->session->flashdata('error'); ?></p>
         <?php endif; ?>
-        
-        <!-- Call to open form via controller_name/function -->
 
         <span id="success_message"></span>
         <form id="new_item_form" method="post">
