@@ -296,8 +296,29 @@ class Products extends CI_Controller {
         $result['title'] = 'All Products';
         $result['table'] = 'All Products Data';
         $result['add'] = 'Add New Product';
-        $result['data'] = $this->Product_model->get_item_names();
+        $result['data'] = $this->Product_model->get_item_details();
         $this->load->view('products/view_items', $result);
+    }
+
+    public function get_product_details() {
+        // Load the view for the add page
+        $this->load->model('Product_model');
+
+        $barcode = $this->input->post('barcode'); 
+
+        //query by sql
+        $product = $this->Product_model->get_details_by_barcode($barcode);
+        
+        // if match found barcode and return echo json encode
+        if ($product) {
+            $array = array(
+                'name' => $product->product_name,
+                'category' => $product->category_name,
+                'brand' => $product->brand_name
+            );
+
+            echo json_encode($array);
+        }     
     }
 
     public function variants() {
@@ -306,8 +327,9 @@ class Products extends CI_Controller {
 
         $data['sizes'] = $this->Product_model->get_sizes();
         $data['colors'] = $this->Product_model->get_colors();
-        $data['products'] = $this->Product_model->get_items();
-        $data['names'] = $this->Product_model->get_item_names();
+
+        // get data from joined tables
+        $data['barcodes'] = $this->Product_model->get_item_details();
 
         $data['title'] = 'Variants';
         $data['header'] = 'New Variants';
