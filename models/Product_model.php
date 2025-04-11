@@ -73,7 +73,7 @@ class Product_model extends CI_Model {
     }
 
 // joining sql, evo products table with brand, category & product name
-public function get_item_names() {
+public function get_item_details() {
     $sql = "
         SELECT 
             evo_products.barcode,
@@ -93,6 +93,29 @@ public function get_item_names() {
     ";
     $query = $this->db->query($sql); // Execute the raw SQL query
     return $query->result(); // Return results as an array of objects
+}
+
+// query product details by barcode
+public function get_details_by_barcode($barcode) {
+    $sql = "
+    SELECT  
+        product.product_name,
+        category.category_name,
+        brand.brand_name
+    FROM
+        evo_products
+    LEFT JOIN
+        product ON product.id = evo_products.product_id
+    LEFT JOIN
+        brand ON brand.id = evo_products.brand_id
+    LEFT JOIN
+        category ON category.id = evo_products.category_id
+    WHERE 
+         evo_products.barcode = ?
+    LIMIT 1
+    ";
+    $query = $this->db->query($sql, [$barcode]);
+    return $query->row(); // return single object
 }
 
 public function get_variants_with_details() {
