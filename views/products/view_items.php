@@ -206,10 +206,11 @@
           echo "<td>".$row->brand_name."</td>";
           echo "<td>".$row->cost."</td>";
           echo "<td>".$row->price."</td>";
-          echo "<td><button id='get-variant-info'>View</button></td>";
+          echo "<td><button id='get-variant-info' type='button' class='btn btn-primary'>View</button></td>";
           echo '<td>
 
-<select name="action" id="action" value="Choose">
+<select name="action" id="action" class="form-select" aria-label="Action">
+  <option selected disabled>Action</option>
   <option value="edit">Edit</option>
   <option value="delete">Delete</option>
 </select></td>';
