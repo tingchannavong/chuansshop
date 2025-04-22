@@ -222,22 +222,36 @@
       </div>
 
       <!-- Item Info Modal -->
-      <div class="modal fade" id="itemInfoModal" tabindex="-1" aria-labelledby="itemInfoModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="itemInfoModalLabel">Item Info</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <p><strong>Barcode:</strong> <span id="modalBarcode"></span></p>
-              <p><strong>Name:</strong> <span id="modalName"></span></p>
-              <p><strong>Price:</strong> <span id="modalPrice"></span></p>
-              <!-- Add more fields as needed -->
-            </div>
+    <div class="modal fade" id="itemInfoModal" tabindex="-1" aria-labelledby="itemInfoModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Item Information</h5>
+            <button type="button" id="close-modal" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+
+            <p><strong>Barcode:</strong> <span id="modalBarcode"></span></p>
+
+            <table class="table table-striped" id="variantTable">
+              <thead>
+                <tr>
+                  <th>No.</th>
+                  <th>Name</th>
+                  <th>Color</th>
+                  <th>Size</th>
+                  <th>Quantity</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Variant rows will be inserted here via jQuery -->
+              </tbody>
+            </table>
+
           </div>
         </div>
       </div>
+    </div>
       <canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas>
 
     </main>
@@ -245,7 +259,7 @@
 </div>
 <script>
            $(document).ready(function () {
-            $(":button").on('click', function (e) {
+            $(':button:not(#close-modal)').on('click', function (e) {
               e.preventDefault(); // prevent default behavior if inside <a> tags
 
             // Find the tr of the clicked button
@@ -254,26 +268,37 @@
             // Get the barcode from the second column (index 1)
             var code = row.find('td').eq(0).text().trim(); 
 
-            console.log(row);
-            console.log(code);
-
             $.ajax({
               url: "<?= base_url('products/displayvariants'); ?>",
               type: 'POST',
               data: { barcode: code },
               dataType: 'json',
               success: function(response) {
-                if (response.success) {
-                  // Fill modal content
-                  $('#modalBarcode').text(response.data.barcode);
-                  $('#modalName').text(response.data.name);
-                  $('#modalPrice').text(response.data.price);
+                if (response.success === true) {
+                  $('#modalBarcode').text(response.data[0].barcode);
 
-                  // Show modal
-                  var itemInfoModal = new bootstrap.Modal(document.getElementById('itemInfoModal'));
-                  itemInfoModal.show();
-                } else {
-                  alert('Item not found');
+                  const $tbody = $('#variantTable tbody');
+                  $tbody.empty(); // clear previous rows
+                  
+                  var i = 1;
+
+                  response.data.forEach(item => {
+                    const row = `
+                      <tr>
+                        <td>${i}</td>
+                        <td>${item.product_name}</td>
+                        <td>${item.color_name}</td>
+                        <td>${item.size_name}</td>
+                        <td>${item.quantity}</td>
+                      </tr>`;
+                    $tbody.append(row);
+                    i+=1;
+                  });
+
+                  const modal = new bootstrap.Modal(document.getElementById('itemInfoModal'));
+                  modal.show();
+                } else if (response.success === false) {
+                  alert('No variants found for this product');
                 }
               },
               error: function (xhr, status, error) {
