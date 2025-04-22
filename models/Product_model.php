@@ -126,14 +126,14 @@ public function get_variants_with_details($barcode) {
     s.size_name, 
     c.color_name, 
     pv.quantity 
-    FROM 
-    evo_products p 
+    FROM  
+    product_variants pv
     LEFT JOIN 
-    product_variants pv ON p.barcode = pv.barcode 
+    evo_products p ON pv.barcode = p.barcode 
     LEFT JOIN color c ON pv.color_id = c.id 
     LEFT JOIN size s ON pv.size_id = s.id 
     LEFT JOIN product n ON p.product_id = n.id 
-    WHERE p.barcode = ?
+    WHERE pv.barcode = ?
     ";
 
     $query = $this->db->query($sql, [$barcode]);
