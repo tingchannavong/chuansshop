@@ -103,15 +103,13 @@ public function get_details_by_barcode($barcode) {
         category.category_name,
         brand.brand_name
     FROM
-        evo_products
+        evo_products 
     LEFT JOIN
         product ON product.id = evo_products.product_id
     LEFT JOIN
         brand ON brand.id = evo_products.brand_id
     LEFT JOIN
         category ON category.id = evo_products.category_id
-    LEFT JOIN
-        size ON size.id = evo_products.category_id
     WHERE 
          evo_products.barcode = ?
     LIMIT 1
@@ -121,16 +119,43 @@ public function get_details_by_barcode($barcode) {
 }
 
 
-public function get_variants_with_details() {
-    $this->db->select('
-        evo_products.barcode,
-        product.product_name
-    ');
-    $this->db->from('evo_products');
-    $this->db->join('product', 'product.id = evo_product.product_id', 'left');
-    $query = $this->db->get();
+public function get_variants_with_details($barcode) {
+    $sql = " SELECT 
+    p.barcode, 
+    n.product_name, 
+    s.size_name, 
+    c.color_name, 
+    pv.quantity 
+    FROM 
+    evo_products p 
+    LEFT JOIN 
+    product_variants pv ON p.barcode = pv.barcode 
+    LEFT JOIN color c ON pv.color_id = c.id 
+    LEFT JOIN size s ON pv.size_id = s.id 
+    LEFT JOIN product n ON p.product_id = n.id 
+    WHERE p.barcode = ?
+    ";
+
+    $query = $this->db->query($sql, [$barcode]);
     return $query->result();
 }
+
+// public function get_variants_with_details($barcode) {
+//     $this->db->select('
+//         p.barcode,
+//         n.product_name,
+//         s.size_name,
+//         c.color_name,
+//         pv.quantity
+//     ');
+//     $this->db->from('evo_products p');
+//     $this->db->join('product_variants pv', 'p.barcode = pv.barcode', 'left');
+//     $this->db->join('color c', 'pv.color_id = c.id', 'left');
+//     $this->db->join('size s', 'pv.size_id = s.id', 'left');
+//     $this->db->join('product n', 'p.product_id = n.id', 'left');
+//     $query = $this->db->where('p.barcode', $barcode);
+//     return $query->result();
+// }
 
     // public function update_user($id, $data) {
     //     """Function to update a user."""
