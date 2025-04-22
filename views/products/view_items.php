@@ -15,6 +15,9 @@
 
 <link href="<?php echo base_url().'assets/css/bootstrap.min.css'; ?>" rel="stylesheet">
 
+<!-- jquery validation plugin  -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
     <style>
       .bi {
         display: inline-block;
@@ -169,7 +172,7 @@
         </div>
       <div class="table-responsive small">
         
-        <table class="table table-striped">
+        <table id='item_table' class="table table-striped">
           <thead>
             <tr class="table-light">
               <th scope="col">No</th>
@@ -179,6 +182,7 @@
               <th scope="col">Brand Name</th>
               <th scope="col">Cost</th>
               <th scope="col">Price</th>
+              <th scope="col">Actions</th>
             </tr>
           </thead>
           <tbody class="table table-striped">
@@ -194,6 +198,12 @@
           echo "<td>".$row->brand_name."</td>";
           echo "<td>".$row->cost."</td>";
           echo "<td>".$row->price."</td>";
+          echo '<td>
+
+<select name="action" id="action" value="Choose">
+  <option value="edit">ແກ້ໄຂ</option>
+  <option value="delete">ລຶບ</option>
+</select></td>';
           echo "</tr>";
           $i++;
           }
@@ -201,7 +211,42 @@
           </tbody>
         </table> 
       </div>
+        <script>
+           $(document).ready(function () {
 
+$("#item_table").on('click', function () {
+  var selectedValue = $(this).closest('tr').data('barcode');
+  console.log('Selected value', selectedValue);
+
+//   $.ajax({
+//     type: "POST",
+//     url: "<?= base_url('products/get_product_details'); ?>",
+//     dataType: "json",
+//     data: {barcode: selectedValue},
+//     success: function (data) {
+//       console.log(data);
+//       if (data.error) {
+//         alert(data.error);
+//       } else {
+//         // update data to html page
+//         console.log(data.product_name);
+//         $('#selectedName').text(`Product Name: ${data.name}`);
+//         $('#selectedCategory').text(`Category Name: ${data.category}`);
+//         $('#selectedBrand').text(`Brand Name: ${data.brand}`);
+//       }
+//     },
+//     error: function (xhr, status, error) {
+//     console.error("AJAX error:", error);
+//     console.error("Response:", xhr.responseText);
+//     alert("500 Server Error. Check browser console for details.");
+// }
+
+  });
+
+});
+
+// });
+          </script>
       <canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas>
 
     </main>
