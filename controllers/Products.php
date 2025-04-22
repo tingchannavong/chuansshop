@@ -375,5 +375,15 @@ class Products extends CI_Controller {
         }
     }
 
-    
+    public function displayvariants() {
+        $this->load->model('Product_model');
+        $barcode = $this->input->post('barcode');
+        $item = $this->Product_model->get_variants_with_details($barcode);
+
+        if ($item) {
+            echo json_encode(['success' => true, 'data' => $item]);
+        } else {
+            echo json_encode(['success' => false]);
+        }
+    } 
 }
