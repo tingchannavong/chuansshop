@@ -18,6 +18,13 @@
 <!-- jquery validation plugin  -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
+<!-- Bootstrap 5 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Bootstrap JS + Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
     <style>
       .bi {
         display: inline-block;
@@ -182,6 +189,7 @@
               <th scope="col">Brand Name</th>
               <th scope="col">Cost</th>
               <th scope="col">Price</th>
+              <th scope="col">Variants</th>
               <th scope="col">Actions</th>
             </tr>
           </thead>
@@ -198,11 +206,12 @@
           echo "<td>".$row->brand_name."</td>";
           echo "<td>".$row->cost."</td>";
           echo "<td>".$row->price."</td>";
+          echo "<td><button id='get-variant-info'>View</button></td>";
           echo '<td>
 
 <select name="action" id="action" value="Choose">
-  <option value="edit">ແກ້ໄຂ</option>
-  <option value="delete">ລຶບ</option>
+  <option value="edit">Edit</option>
+  <option value="delete">Delete</option>
 </select></td>';
           echo "</tr>";
           $i++;
@@ -211,50 +220,83 @@
           </tbody>
         </table> 
       </div>
-        <script>
-           $(document).ready(function () {
 
-$("#item_table").on('click', function () {
-  var selectedValue = $(this).closest('tr').data('barcode');
-  console.log('Selected value', selectedValue);
-
-//   $.ajax({
-//     type: "POST",
-//     url: "<?= base_url('products/get_product_details'); ?>",
-//     dataType: "json",
-//     data: {barcode: selectedValue},
-//     success: function (data) {
-//       console.log(data);
-//       if (data.error) {
-//         alert(data.error);
-//       } else {
-//         // update data to html page
-//         console.log(data.product_name);
-//         $('#selectedName').text(`Product Name: ${data.name}`);
-//         $('#selectedCategory').text(`Category Name: ${data.category}`);
-//         $('#selectedBrand').text(`Brand Name: ${data.brand}`);
-//       }
-//     },
-//     error: function (xhr, status, error) {
-//     console.error("AJAX error:", error);
-//     console.error("Response:", xhr.responseText);
-//     alert("500 Server Error. Check browser console for details.");
-// }
-
-  });
-
-});
-
-// });
-          </script>
+      <!-- Item Info Modal -->
+      <div class="modal fade" id="itemInfoModal" tabindex="-1" aria-labelledby="itemInfoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="itemInfoModalLabel">Item Info</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <p><strong>Barcode:</strong> <span id="modalBarcode"></span></p>
+              <p><strong>Name:</strong> <span id="modalName"></span></p>
+              <p><strong>Price:</strong> <span id="modalPrice"></span></p>
+              <!-- Add more fields as needed -->
+            </div>
+          </div>
+        </div>
+      </div>
       <canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas>
 
     </main>
   </div>
 </div>
-<script src="<?php base_url('assets/js/bootstrap.bundle.min.js') ?>"></script>
+<script>
+           $(document).ready(function () {
+            $(":button").on('click', function (e) {
+              e.preventDefault(); // prevent default behavior if inside <a> tags
 
+            // Find the tr of the clicked button
+            var row = $(this).parents('tr:first');
 
+            // Get the barcode from the second column (index 1)
+            var code = row.find('td').eq(0).text().trim(); 
+
+            console.log(row);
+            console.log(code);
+
+            $.ajax({
+              url: "<?= base_url('products/displayvariants'); ?>",
+              type: 'POST',
+              data: { barcode: code },
+              dataType: 'json',
+              success: function(response) {
+                if (response.success) {
+                  // Fill modal content
+                  $('#modalBarcode').text(response.data.barcode);
+                  $('#modalName').text(response.data.name);
+                  $('#modalPrice').text(response.data.price);
+
+                  // Show modal
+                  var itemInfoModal = new bootstrap.Modal(document.getElementById('itemInfoModal'));
+                  itemInfoModal.show();
+                } else {
+                  alert('Item not found');
+                }
+              },
+              error: function (xhr, status, error) {
+                console.error("AJAX error:", error);
+                console.error("Response:", xhr.responseText);
+              }
+            });
+          });
+          });
+
+$("#action").on('change', function () {
+  // console.log('Selected value', selectedValue);
+  console.log($(this).text());
+
+  var table = $("item_table");
+  var row = $(this).find('tr');;
+  console.log(row);
+  var barcode = row.find('td:eq(0)').text().trim(); // 0-based index: 1 = second column
+  console.log(`the barcode is ${barcode}`);
+
+});
+          </script>
+    <script src="<?php base_url('assets/js/bootstrap.bundle.min.js') ?>"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.2/dist/chart.umd.js" integrity="sha384-eI7PSr3L1XLISH8JdDII5YN/njoSsxfbrkCTnJrzXt+ENP5MOVBxD+l6sEG4zoLp" crossorigin="anonymous"></script>
     <script src="<?php base_url('assets/js/dashboard.js') ?>"></script>
   </body>
