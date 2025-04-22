@@ -110,6 +110,8 @@ public function get_details_by_barcode($barcode) {
         brand ON brand.id = evo_products.brand_id
     LEFT JOIN
         category ON category.id = evo_products.category_id
+    LEFT JOIN
+        size ON size.id = evo_products.category_id
     WHERE 
          evo_products.barcode = ?
     LIMIT 1
@@ -117,6 +119,7 @@ public function get_details_by_barcode($barcode) {
     $query = $this->db->query($sql, [$barcode]);
     return $query->row(); // return single object
 }
+
 
 public function get_variants_with_details() {
     $this->db->select('
