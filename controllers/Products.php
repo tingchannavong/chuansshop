@@ -232,9 +232,7 @@ class Products extends CI_Controller {
     }
 
     public function item() {
-        // Load the view for the add page
-        $this->load->model('Product_model');
-
+        // function to add new tem
         $data['brands'] = $this->Product_model->get_brands();
         $data['categories'] = $this->Product_model->get_categories();
         $data['names'] = $this->Product_model->get_product_names();
@@ -301,8 +299,6 @@ class Products extends CI_Controller {
     }
 
     public function get_product_details() {
-        // Load the view for the add page
-        $this->load->model('Product_model');
 
         $barcode = $this->input->post('barcode'); 
 
@@ -322,7 +318,7 @@ class Products extends CI_Controller {
     }
 
     public function displayvariants() {
-        $this->load->model('Product_model');
+    
         $barcode = $this->input->post('barcode');
         $item = $this->Product_model->get_variants_with_details($barcode);
 
@@ -334,8 +330,6 @@ class Products extends CI_Controller {
     } 
 
     public function variants() {
-        // Load the view for the add page
-        $this->load->model('Product_model');
 
         $data['sizes'] = $this->Product_model->get_sizes();
         $data['colors'] = $this->Product_model->get_colors();
@@ -387,5 +381,17 @@ class Products extends CI_Controller {
         }
     }
 
-    
+    public function delete() {
+
+        $id = $this->input->post('id');
+
+        $result = $this->Product_model->delete('evo_products', 'barcode', $id);
+
+        if ($result) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false]);
+        }  
+    } 
+        
 }
