@@ -140,6 +140,12 @@ public function get_variants_with_details($barcode) {
     return $query->result();
 }
 
+public function delete($table, $ref, $id) {
+    $result = $this->db->delete($table, [$ref=>$id]);
+    return $result;
+
+} 
+
 // public function get_variants_with_details($barcode) {
 //     $this->db->select('
 //         p.barcode,
