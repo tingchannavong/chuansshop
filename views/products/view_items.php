@@ -15,8 +15,16 @@
 
 <link href="<?php echo base_url().'assets/css/bootstrap.min.css'; ?>" rel="stylesheet">
 
+<!-- Pass link as api url to external js file -->
+<script>
+  const API_URL = "<?= base_url('products/delete'); ?>";
+</script>
+
 <!-- jquery validation plugin  -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+<!-- Link to external js file !! -->
+<script type='text/javascript' src="<?php echo base_url(); ?>assets/js/actions.js"></script>
 
 <!-- Bootstrap 5 CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -169,7 +177,7 @@
             <a href="<?php echo site_url('products/item') ?>">
             <button type="button" class="btn btn-sm btn-outline-secondary"><?php echo $add; ?></button>
             </a>
-            <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+            <button id="export" type="button" class="btn btn-sm btn-outline-secondary">Export</button>
           </div>
           <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center gap-1">
             <svg class="bi"><use xlink:href="#calendar3"/></svg>
@@ -210,7 +218,7 @@
           echo '<td>
 
 <select name="action" id="action" class="form-select" aria-label="Action">
-  <option selected disabled>Action</option>
+  <option selected disabled value="act">Action</option>
   <option value="edit">Edit</option>
   <option value="delete">Delete</option>
 </select></td>';
@@ -222,7 +230,7 @@
         </table> 
       </div>
 
-      <!-- Item Info Modal -->
+    <!-- Item Info Modal -->
     <div class="modal fade" id="itemInfoModal" tabindex="-1" aria-labelledby="itemInfoModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -253,74 +261,83 @@
         </div>
       </div>
     </div>
+
+    <!-- Are You Sure Modal -->
+    <div class="modal fade" id="deletePrompt" tabindex="-1" aria-labelledby="deleteoModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Are you sure?</h5>
+            <button type="button" id="close-modal" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+
+            <h2>Do you confirm to delete item <strong>Barcode:</strong> <span id="modalID"></span> ?</h2> 
+            <button type="button" id="yes_del" class="btn btn-danger"> Yes, delete it! </button>
+            <button type="button" id="no_del" class="btn btn-secondary" data-bs-dismiss="modal"> No </button>
+
+          </div>
+        </div>
+      </div>
+    </div>
       <canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas>
 
     </main>
   </div>
 </div>
 <script>
-           $(document).ready(function () {
-            $(':button:not(#close-modal)').on('click', function (e) {
-              e.preventDefault(); // prevent default behavior if inside <a> tags
+        $(document).ready(function () {
+        $('button').filter('#get-variant-info').on('click', function (e) {
+          e.preventDefault(); // prevent default behavior if inside <a> tags
 
-            // Find the tr of the clicked button
-            var row = $(this).parents('tr:first');
+        // Find the tr of the clicked button
+        var row = $(this).parents('tr:first');
 
-            // Get the barcode from the second column (index 1)
-            var code = row.find('td').eq(0).text().trim(); 
+        // Get the barcode from the second column (index 1)
+        var code = row.find('td').eq(0).text().trim(); 
 
-            $.ajax({
-              url: "<?= base_url('products/displayvariants'); ?>",
-              type: 'POST',
-              data: { barcode: code },
-              dataType: 'json',
-              success: function(response) {
-                if (response.success === true) {
-                  $('#modalBarcode').text(response.data[0].barcode);
+        $.ajax({
+          url: "<?= base_url('products/displayvariants'); ?>",
+          type: 'POST',
+          data: { barcode: code },
+          dataType: 'json',
+          success: function(response) {
+            if (response.success === true) {
+              $('#modalBarcode').text(response.data[0].barcode);
 
-                  const $tbody = $('#variantTable tbody');
-                  $tbody.empty(); // clear previous rows
-                  
-                  var i = 1;
+              const $tbody = $('#variantTable tbody');
+              $tbody.empty(); // clear previous rows
+              
+              var i = 1;
 
-                  response.data.forEach(item => {
-                    const row = `
-                      <tr>
-                        <td>${i}</td>
-                        <td>${item.product_name}</td>
-                        <td>${item.color_name}</td>
-                        <td>${item.size_name}</td>
-                        <td>${item.quantity}</td>
-                      </tr>`;
-                    $tbody.append(row);
-                    i+=1;
-                  });
+              response.data.forEach(item => {
+                const row = `
+                  <tr>
+                    <td>${i}</td>
+                    <td>${item.product_name}</td>
+                    <td>${item.color_name}</td>
+                    <td>${item.size_name}</td>
+                    <td>${item.quantity}</td>
+                  </tr>`;
+                $tbody.append(row);
+                i+=1;
+              });
 
-                  const modal = new bootstrap.Modal(document.getElementById('itemInfoModal'));
-                  modal.show();
-                } else if (response.success === false) {
-                  alert('No variants found for this product');
-                }
-              },
-              error: function (xhr, status, error) {
-                console.error("AJAX error:", error);
-                console.error("Response:", xhr.responseText);
-              }
-            });
-          });
-          });
+              const modal = new bootstrap.Modal(document.getElementById('itemInfoModal'));
+              modal.show();
+            } else if (response.success === false) {
+              alert('No variants found for this product');
+            }
+          },
+          error: function (xhr, status, error) {
+            console.error("AJAX error:", error);
+            console.error("Response:", xhr.responseText);
+          }
+        });
+      });
 
-$("#action").on('change', function () {
-  // console.log('Selected value', selectedValue);
-  console.log($(this).text());
+      });  
 
-  var table = $("item_table");
-  var row = $(this).find('tr');;
-  console.log(row);
-  var barcode = row.find('td:eq(0)').text().trim(); // 0-based index: 1 = second column
-  console.log(`the barcode is ${barcode}`);
-
-});
           </script>
     <script src="<?php base_url('assets/js/bootstrap.bundle.min.js') ?>"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.2/dist/chart.umd.js" integrity="sha384-eI7PSr3L1XLISH8JdDII5YN/njoSsxfbrkCTnJrzXt+ENP5MOVBxD+l6sEG4zoLp" crossorigin="anonymous"></script>
