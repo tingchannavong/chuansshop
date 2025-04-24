@@ -146,6 +146,12 @@ public function delete($table, $ref, $id) {
 
 } 
 
+public function update($table, $data, $id) 
+{
+    $result = $this->db->where('barcode', $id)->update($table, $data);
+    return $result;
+}
+
 // public function get_variants_with_details($barcode) {
 //     $this->db->select('
 //         p.barcode,
