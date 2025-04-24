@@ -15,16 +15,16 @@
 
 <link href="<?php echo base_url().'assets/css/bootstrap.min.css'; ?>" rel="stylesheet">
 
+<!-- jquery validation plugin *has to be called before .js -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
 <!-- Pass link as api url to external js file -->
 <script>
   const API_URL = "<?= base_url('products/delete'); ?>";
 </script>
 
-<!-- jquery validation plugin  -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-
 <!-- Link to external js file !! -->
-<script type='text/javascript' src="<?php echo base_url(); ?>assets/js/actions.js"></script>
+<!-- <script type='text/javascript' src="<?php echo base_url(); ?>assets/js/actions.js"></script> -->
 
 <!-- Bootstrap 5 CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -262,7 +262,7 @@
       </div>
     </div>
 
-    <!-- Are You Sure Modal -->
+    <!-- Are You Sure Delete? Modal -->
     <div class="modal fade" id="deletePrompt" tabindex="-1" aria-labelledby="deleteoModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -287,6 +287,7 @@
 </div>
 <script>
         $(document).ready(function () {
+        
         $('button').filter('#get-variant-info').on('click', function (e) {
           e.preventDefault(); // prevent default behavior if inside <a> tags
 
@@ -335,6 +336,56 @@
           }
         });
       });
+
+      // Delete button
+      $("select").on('change', function () {
+      // Find the tr of the clicked button
+      var row = $(this).parents('tr:first');
+  
+      // Get the barcode from the second column (index 1)
+      var id_selected = row.find('td').eq(0).text().trim();
+
+      $('#modalID').text(id_selected);
+
+      var selectedOption = $(this).val();
+
+      if (selectedOption === "delete") {
+        
+        const modal = new bootstrap.Modal(document.getElementById('deletePrompt'));
+        modal.show();
+
+        $('#yes_del').on('click', function() {
+          $.ajax({
+            url: API_URL,
+            type: 'POST',
+            data: { id: id_selected },
+            dataType: 'json',
+            success: function(response) {
+              if (response.success === true) {
+                alert('Successfully deleted.');
+                location.reload();
+              } else if (response.success === false) {
+                alert('Failed to delete. Please try again.');
+              }
+            },
+            error: function (xhr, status, error) {
+              console.error("AJAX error:", error);
+              console.error("Response:", xhr.responseText);
+            }
+          });
+        });
+        $(this).val('act'); // Reset the select value
+    } else if (selectedOption === "edit") {
+
+      console.log("waiting to perform edit op");
+
+      $(this).val('act'); // Reset the select value
+
+      window.location.href="<?php echo site_url('products/edit'); ?>";
+      
+    } 
+
+    });
 
       });  
 
