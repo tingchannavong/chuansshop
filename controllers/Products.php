@@ -392,6 +392,17 @@ class Products extends CI_Controller {
         } else {
             echo json_encode(['success' => false]);
         }  
-    } 
+    }
+
+    public function edit() {
+
+        // call inf with ID before one can edit
+
+        $data['title'] = 'Edit';
+        $result['header'] = 'Edit Item';
+        $this->load->view('layouts/header', $data);
+        $this->load->view('products/edit_item', $result);
         
+    }   
+
 }
