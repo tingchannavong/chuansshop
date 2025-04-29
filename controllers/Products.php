@@ -295,6 +295,7 @@ class Products extends CI_Controller {
         $result['table'] = 'All Products Data';
         $result['add'] = 'Add New Product';
         $result['data'] = $this->Product_model->get_item_details();
+        $result['categories'] = $this->Product_model->get_categories();
         $this->load->view('products/view_items', $result);
     }
 
@@ -463,5 +464,16 @@ class Products extends CI_Controller {
     
         return;
     } 
+
+    public function filter($id) 
+    {
+        // call info with where cat id get(table)
+
+        // serve as data array and send back echo json encode
+
+        // var_dump($result['data']); // Check structure
+        // die(); 
+        
+    }  
 
 }

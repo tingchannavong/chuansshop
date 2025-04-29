@@ -179,10 +179,12 @@
             </a>
             <button id="export" type="button" class="btn btn-sm btn-outline-secondary">Export</button>
           </div>
-          <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center gap-1">
-            <svg class="bi"><use xlink:href="#calendar3"/></svg>
-            This week
-          </button>
+          <select name="category_filter" id="cat_filter">
+                    <option value="">Filter Category</option>
+                    <?php foreach ($categories as $category): ?>
+                        <option value="<?= $category->id ?>"><?= $category->category_name ?></option>
+                    <?php endforeach; ?>
+            </select>
         </div>
         </div>
       <div class="table-responsive small">
@@ -286,8 +288,8 @@
   </div>
 </div>
 <script>
-        $(document).ready(function () {
-        
+  $(document).ready(function () {
+  
         $('button').filter('#get-variant-info').on('click', function (e) {
           e.preventDefault(); // prevent default behavior if inside <a> tags
 
@@ -375,6 +377,7 @@
           });
         });
         $(this).val('act'); // Reset the select value
+
     } else if (selectedOption === "edit") {
 
       console.log("waiting to perform edit op");
@@ -385,7 +388,22 @@
       window.location.href = baseEditUrl + id_selected;
       
     } 
+    });
 
+    $("#cat_filter").on("change", function () {
+      var selectedCategory = $(this).val();
+
+      $.post("url controller", {id: selectedCategory}, function(result, status) {
+        // if error
+        // return
+        // else if success
+        
+          // grab table id and remove rows
+          // $("#table_of_items tr").remove(); 
+
+          // grab result from filter
+          // update table with result data
+      });
     });
 
       });  
