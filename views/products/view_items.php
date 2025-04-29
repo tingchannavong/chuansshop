@@ -381,7 +381,8 @@
 
       $(this).val('act'); // Reset the select value
 
-      window.location.href="<?php echo site_url('products/edit'); ?>";
+      var baseEditUrl = "<?php echo site_url('products/edit/'); ?>";
+      window.location.href = baseEditUrl + id_selected;
       
     } 
 
