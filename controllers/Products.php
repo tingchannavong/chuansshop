@@ -417,15 +417,51 @@ class Products extends CI_Controller {
     }   
 
     public function update() {
-        // not yet checked
 
-        $data['title'] = $this->input->post('title');
-		$data['description'] = $this->input->post('description');
-
-		$this->crud->update('posts', $data, $id);
-		$this->session->set_flashdata('message', '<div class="alert alert-success">Record has been updated successfully.</div>');
-		redirect(base_url());
+        $this->form_validation->set_rules('name_id', 'name', 'required');
+        $this->form_validation->set_rules('cost', 'cost', 'required');
+        $this->form_validation->set_rules('price', 'price', 'required');
+    
+        if ($this->form_validation->run() == FALSE) {
+            // return validation errors in json format
+            $array = array(
+                'error' => true,
+                'name_error' => form_error('name_id'),
+                'cost_error' => form_error('cost'),
+                'price_error' => form_error('price'),
+            );
+            echo json_encode($array);
+            return;
+        }
+    
+        // Prepare data to insert into the database
+        $data = array(
+            'product_id' => $this->input->post('name_id'),
+            'category_id' => $this->input->post('category'),
+            'brand_id' => $this->input->post('brand'),
+            'cost' => $this->input->post('cost'),
+            'price' => $this->input->post('price'),
+        );
         
+        $table = "evo_products";
+        $ref = "barcode";
+        $id = $this->input->post('barcode');
+        // $id = $_POST['barcode'];
+
+        // Insert data using the model
+        if ($this->Product_model->update($table, $data, $ref, $id)) {
+            echo json_encode([
+                'status' => 'success',
+                'message' => 'Form submitted successfully!'
+            ]);
+        } else {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Update failed!'
+            ]);
+        }
+    
+        return;
     } 
 
 }

@@ -165,16 +165,16 @@
         <?php endif; ?>
 
         <span id="success_message"></span>
-        <form id="new_item_form" method="post">
+        <form id="edit_item_form" method="post">
         <div class="row g-3">
             <div class="col-lg-12">
-                <label for="barcode" class="form-label">Barcode:</label>
-                <p id="barcode"><?php echo $data['barcode']; ?></p>
+                <label for="barcode" class="form-label">Barcode:</label> 
+                <input name="barcode" type="number" class="form-control" id="inputBarcode" value="<?php echo $data['barcode']; ?>" readonly>
             </div>
             <div class="col-lg-4">
                 <label for="name_id" class="form-label">Name</label>
                 <select name="name_id">
-                    <option value=""><?php echo $details->product_name; ?></option>
+                    <option value="<?php echo $data['product_id']; ?>"><?php echo $details->product_name; ?></option>
                     <?php foreach ($names as $name): ?>
                         <option value="<?= $name->id ?>"><?= $name->product_name ?></option>
                     <?php endforeach; ?>
@@ -185,7 +185,7 @@
             <div class="col-lg-4">
                 <label for="category" class="form-label">Category</label>
                 <select name="category">
-                    <option value=""><?php echo $details->category_name; ?></option>
+                    <option value="<?php echo $data['category_id']; ?>"><?php echo $details->category_name; ?></option>
                     <?php foreach ($categories as $category): ?>
                         <option value="<?= $category->id ?>"><?= $category->category_name ?></option>
                     <?php endforeach; ?>
@@ -232,24 +232,25 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
-    $('#redirect').on("click", function (event) {
+
+    $("#redirect").on("click", function (event) {
       window.location.assign("<?= site_url('products/displayitems'); ?>");
     });
 
-    $("#new_item_form").on('submit', function (event) {
+    $("#edit_item_form").on('submit', function (event) {
         event.preventDefault(); // Prevent regular form submission
+        console.log($(this).serialize());
 
         $.ajax({
-            url: "<?= base_url('products/item_submit'); ?>",
+            url: "<?= base_url('products/update'); ?>",
             type: 'POST',
             data: $(this).serialize(),
             dataType: 'json', // tells jQuery to parse the response as JSON
             success: function (response) {
+              
                 if (response.status === "success") {
                   window.location.assign("<?= site_url('products/displayitems'); ?>");
-                  console.log("success");
                 } else if (response.error) {
-                    $('#barcode_error').html(response.barcode_error || '');
                     $('#name_error').html(response.name_error || '');
                     $('#cost_error').html(response.cost_error || '');
                     $('#price_error').html(response.price_error || '');
@@ -277,18 +278,3 @@
 
     </body>
 </html>
-
-// <!-- rules: {
-// 		barcode: {
-//       barcode: {required: true, minlength: 3},
-// 			name_id: {required: true},
-//       cost: {required: true},
-//       price: {required: true}
-// 			},
-//     messages: {
-//       barcode: {required: "Please enter a valid barcode.", minlength: "Minimum length is 3"},
-//       name_id: {required: "Please select an item name"},
-//       cost: {required: "Please input cost"},
-//       price: {required: "Please input price"}
-//     },
-//     submitHandler: function (form)  -->
