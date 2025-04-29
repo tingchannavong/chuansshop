@@ -168,15 +168,13 @@
         <form id="new_item_form" method="post">
         <div class="row g-3">
             <div class="col-lg-12">
-                <label for="barcode" class="form-label">Barcode</label>
-                <input name="barcode" type="text" class="form-control" id="inputBarcode" value="<?php echo $data['barcode']; ?>">
-                <span id="barcode_error"></span>
-                <?php echo form_error('barcode'); ?>
+                <label for="barcode" class="form-label">Barcode:</label>
+                <p id="barcode"><?php echo $data['barcode']; ?></p>
             </div>
             <div class="col-lg-4">
                 <label for="name_id" class="form-label">Name</label>
                 <select name="name_id">
-                    <option value="">Select Name</option>
+                    <option value=""><?php echo $details->product_name; ?></option>
                     <?php foreach ($names as $name): ?>
                         <option value="<?= $name->id ?>"><?= $name->product_name ?></option>
                     <?php endforeach; ?>
@@ -187,7 +185,7 @@
             <div class="col-lg-4">
                 <label for="category" class="form-label">Category</label>
                 <select name="category">
-                    <option value="">Select Category</option>
+                    <option value=""><?php echo $details->category_name; ?></option>
                     <?php foreach ($categories as $category): ?>
                         <option value="<?= $category->id ?>"><?= $category->category_name ?></option>
                     <?php endforeach; ?>
@@ -197,7 +195,7 @@
             <div class="col-lg-4">
                 <label for="brand" class="form-label">Brand</label>
                 <select name="brand">
-                    <option value="<?php echo $data['brand_id']; ?>">Select Brand</option>
+                    <option value="<?php echo $data['brand_id']; ?>"><?php echo $details->brand_name; ?></option>
                     <?php foreach ($brands as $brand): ?>
                         <option value="<?= $brand->id ?>"><?= $brand->brand_name ?></option>
                     <?php endforeach; ?>
