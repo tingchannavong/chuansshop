@@ -146,9 +146,9 @@ public function delete($table, $ref, $id) {
 
 } 
 
-public function update($table, $data, $id) 
+public function update($table, $data, $column, $id) 
 {
-    $result = $this->db->where('barcode', $id)->update($table, $data);
+    $result = $this->db->where($column, $id)->update($table, $data);
     return $result;
 }
 
