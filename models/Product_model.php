@@ -152,6 +152,15 @@ public function update($table, $data, $id)
     return $result;
 }
 
+public function find_record_by_id($table, $id) 
+{
+    // cannot call -> row() function on array
+    $query = $this->db->get_where($table, ['barcode' => $id]);
+
+    $result = $query->row_array();
+    return $result;
+}
+
 // public function get_variants_with_details($barcode) {
 //     $this->db->select('
 //         p.barcode,
