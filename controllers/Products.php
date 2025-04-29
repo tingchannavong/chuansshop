@@ -394,15 +394,35 @@ class Products extends CI_Controller {
         }  
     }
 
-    public function edit() {
+    public function edit($id) {
 
         // call inf with ID before one can edit
 
-        $data['title'] = 'Edit';
+        $info['title'] = 'Edit';
         $result['header'] = 'Edit Item';
-        $this->load->view('layouts/header', $data);
+        $result['data'] = $this->Product_model->find_record_by_id('evo_products', $id);
+        $result['brands'] = $this->Product_model->get_brands();
+        $result['categories'] = $this->Product_model->get_categories();
+        $result['names'] = $this->Product_model->get_product_names();
+
+        var_dump($result['data']); // Check structure
+        die(); 
+
+        $this->load->view('layouts/header', $info);
         $this->load->view('products/edit_item', $result);
         
     }   
+
+    public function update() {
+        // not yet checked
+
+        $data['title'] = $this->input->post('title');
+		$data['description'] = $this->input->post('description');
+
+		$this->crud->update('posts', $data, $id);
+		$this->session->set_flashdata('message', '<div class="alert alert-success">Record has been updated successfully.</div>');
+		redirect(base_url());
+        
+    } 
 
 }
