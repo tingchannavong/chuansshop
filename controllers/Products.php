@@ -394,22 +394,25 @@ class Products extends CI_Controller {
         }  
     }
 
-    public function edit($id) {
-
-        // call inf with ID before one can edit
-
+    public function edit($id) 
+    {
         $info['title'] = 'Edit';
         $result['header'] = 'Edit Item';
+
+        // call info with ID before one can edit
         $result['data'] = $this->Product_model->find_record_by_id('evo_products', $id);
+        $result['details'] = $this->Product_model->get_details_by_barcode($id);
+
+        // loop to get all available brands, categories and names
         $result['brands'] = $this->Product_model->get_brands();
         $result['categories'] = $this->Product_model->get_categories();
         $result['names'] = $this->Product_model->get_product_names();
 
-        var_dump($result['data']); // Check structure
-        die(); 
-
         $this->load->view('layouts/header', $info);
         $this->load->view('products/edit_item', $result);
+
+        // var_dump($result['data']); // Check structure
+        // die(); 
         
     }   
 

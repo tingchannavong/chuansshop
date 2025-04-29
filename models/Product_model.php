@@ -154,6 +154,7 @@ public function update($table, $data, $id)
 
 public function find_record_by_id($table, $id) 
 {
+    // need to join to brand, product name, category
     // cannot call -> row() function on array
     $query = $this->db->get_where($table, ['barcode' => $id]);
 
