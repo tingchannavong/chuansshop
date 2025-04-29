@@ -169,7 +169,7 @@
         <div class="row g-3">
             <div class="col-lg-12">
                 <label for="barcode" class="form-label">Barcode</label>
-                <input name="barcode" type="text" class="form-control" id="inputBarcode">
+                <input name="barcode" type="text" class="form-control" id="inputBarcode" value="<?php echo $data['barcode']; ?>">
                 <span id="barcode_error"></span>
                 <?php echo form_error('barcode'); ?>
             </div>
@@ -197,7 +197,7 @@
             <div class="col-lg-4">
                 <label for="brand" class="form-label">Brand</label>
                 <select name="brand">
-                    <option value="">Select Brand</option>
+                    <option value="<?php echo $data['brand_id']; ?>">Select Brand</option>
                     <?php foreach ($brands as $brand): ?>
                         <option value="<?= $brand->id ?>"><?= $brand->brand_name ?></option>
                     <?php endforeach; ?>
@@ -206,13 +206,13 @@
             </div>
             <div class="col-lg-4">
                 <label for="cost" class="form-label">Cost</label>
-                <input name="cost" type="number" class="form-control" id="inputcost">
+                <input name="cost" type="number" class="form-control" id="inputcost" value="<?php echo $data['cost']; ?>">
                 <span id="cost_error"></span>
                 <?php echo form_error('cost'); ?>
             </div>
             <div class="col-lg-4">
                 <label for="price" class="form-label">Price</label>
-                <input name="price" type="number" class="form-control" id="inputprice">
+                <input name="price" type="number" class="form-control" id="inputprice" value="<?php echo $data['price']; ?>">
                 <span id="price_error"></span>
                 <?php echo form_error('price'); ?>
             </div>
@@ -220,12 +220,10 @@
       
         <div class="row g-3 justify-content-start gx-1">
             <div class="col-md-3">
-                <button name="submit" type="submit" class="btn btn-warning">Next</button>
+                <button name="submit" type="submit" class="btn btn-warning">Edit</button>
             </div>
             <div class="col-md-3">
                 <button id="cancelBtn" onclick="window.location.href='<?php echo site_url('products/displayitems'); ?>'" type="button" class="btn btn-danger">Cancel</button>
-                <button id="redirect" type="button" class="btn btn-danger">Redirect</button>
-
             </div>
         </div>
         </form>
