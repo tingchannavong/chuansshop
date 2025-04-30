@@ -180,7 +180,8 @@
             <button id="export" type="button" class="btn btn-sm btn-outline-secondary">Export</button>
           </div>
           <select name="category_filter" id="cat_filter">
-                    <option value="">Filter Category</option>
+                    <option selected disabled value="">Filter Category</option>
+                    <option value="all">All</option>
                     <?php foreach ($categories as $category): ?>
                         <option value="<?= $category->id ?>"><?= $category->category_name ?></option>
                     <?php endforeach; ?>
@@ -393,17 +394,46 @@
     $("#cat_filter").on("change", function () {
       var selectedCategory = $(this).val();
 
-      $.post("url controller", {id: selectedCategory}, function(result, status) {
-        // if error
-        // return
-        // else if success
-        
-          // grab table id and remove rows
-          // $("#table_of_items tr").remove(); 
+      $.post("<?= base_url('products/filter'); ?>", {id: selectedCategory}, function(result, status) {
 
-          // grab result from filter
+        if (!result) {
+          console.log(status);
+        } else if (result) {
+          // grab table id and remove rows from tbody
+          $("#item_table tbody tr").remove();
+          console.log(result['data'][0]['barcode']);
+          console.log(result.data);
+
+          
+          var markup = "";
+          var i = 1;
+
+          // grab result from filter inro markups
+          $.each(result.data, function(index, row) {
+            markup += '<tr>';
+            markup += '<th scope="row">' + i + '</th>';
+            markup += '<td>' + row.barcode + '</td>';
+            markup += '<td>' + row.product_name + '</td>';
+            markup += '<td>' + row.category_name + '</td>';
+            markup += '<td>' + row.brand_name + '</td>';
+            markup += '<td>' + row.cost + '</td>';
+            markup += '<td>' + row.price + '</td>';
+            markup += '<td><button id="get-variant-info" type="button" class="btn btn-primary">View</button></td>';
+            markup += '<td><select name="action" class="form-select action-dropdown" aria-label="Action">';
+            markup += '<option selected disabled value="act">Action</option>';
+            markup += '<option value="edit">Edit</option>';
+            markup += '<option value="delete">Delete</option>';
+            markup += '</select></td>';
+            markup += '</tr>';
+            i++;
+          });
+
           // update table with result data
-      });
+          tableBody = $("#item_table tbody");
+          tableBody.append(markup);
+
+        }
+      }, "json");
     });
 
       });  
