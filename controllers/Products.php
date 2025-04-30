@@ -401,7 +401,7 @@ class Products extends CI_Controller {
         $result['header'] = 'Edit Item';
 
         // call info with ID before one can edit
-        $result['data'] = $this->Product_model->find_record_by_id('evo_products', $id);
+        $result['data'] = $this->Product_model->find_record_by_id('evo_products', 'barcode', $id);
         $result['details'] = $this->Product_model->get_details_by_barcode($id);
 
         // loop to get all available brands, categories and names
@@ -465,15 +465,26 @@ class Products extends CI_Controller {
         return;
     } 
 
-    public function filter($id) 
+    public function filter() 
     {
-        // call info with where cat id get(table)
+        $id = $this->input->post('id');
 
-        // serve as data array and send back echo json encode
+        if ($id === "all") {
+            $result = $this->Product_model->get_item_details();
+        } else {
+            // execute filter logic call info with where cat id get(table)
+            $conditions = [
+                'evo_products.category_id' => $id,
+            ];
+            $result = $this->Product_model->get_item_details_filtered($conditions);    
+        }
 
-        // var_dump($result['data']); // Check structure
-        // die(); 
-        
+        if (!$result) {
+            echo json_encode(['success' => false]);
+        } else {
+            echo json_encode(['success' => true, 'data' => $result]);
+          
+        }
     }  
 
 }
