@@ -152,13 +152,34 @@ public function update($table, $data, $column, $id)
     return $result;
 }
 
-public function find_record_by_id($table, $id) 
+public function find_record_by_id($table, $col, $id) 
 {
     // cannot call -> row() function on array
-    $query = $this->db->get_where($table, ['barcode' => $id]);
+    $query = $this->db->get_where($table, [$col => $id]);
 
-    $result = $query->row_array();
+    $result = $query->row_array(); // row array returns only the first row
     return $result;
+}
+
+public function find_records($table, $conditions = [])
+{
+    $query = $this->db->get_where($table, $conditions);
+    return $query->result_array(); // result array returns all matched rows
+}
+
+public function get_item_details_filtered($conditions = [])
+{
+    $this->db->select('evo_products.*, product.product_name, category.category_name, brand.brand_name');
+    $this->db->from('evo_products');
+    $this->db->join('product', 'product.id = evo_products.product_id', 'left');
+    $this->db->join('brand', 'brand.id = evo_products.brand_id', 'left');
+    $this->db->join('category', 'category.id = evo_products.category_id', 'left');
+    
+    if (!empty($conditions)) {
+        $this->db->where($conditions);
+    }
+    
+    return $this->db->get()->result_array();
 }
 
 // public function get_variants_with_details($barcode) {
