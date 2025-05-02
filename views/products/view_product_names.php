@@ -15,6 +15,24 @@
 
 <link href="<?php echo base_url().'assets/css/bootstrap.min.css'; ?>" rel="stylesheet">
 
+<!-- jquery validation plugin *has to be called before .js -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+<!-- Pass link as api url to external js file -->
+<script>
+  const DEL_URL = "<?= base_url('products/delete'); ?>";
+  const EDIT_URL = "<?php echo site_url('products/mod/name/'); ?>";
+</script>
+
+<!-- Link to external js file !! -->
+<script type='text/javascript' src="<?php echo base_url(); ?>assets/js/actions.js"></script>
+
+<!-- Bootstrap 5 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Bootstrap JS + Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <style>
       .bi {
         display: inline-block;
@@ -175,6 +193,7 @@
               <th scope="col">No</th>
               <th scope="col">Product ID</th>
               <th scope="col">Product Name</th>
+              <th scope="col">Action</th>
             </tr>
           </thead>
           <tbody class="table table-striped">
@@ -186,6 +205,12 @@
           echo "<th scope='row'>".$i."</th>";
           echo "<td>".$row->id."</td>";
           echo "<td>".$row->product_name."</td>";
+          echo '<td>
+<select name="action" class="form-select" aria-label="Action">
+  <option selected disabled value="act">Action</option>
+  <option value="edit">Edit</option>
+  <option value="delete">Delete</option>
+</select></td>';
           echo "</tr>";
           $i++;
           }
@@ -194,13 +219,31 @@
         </table> 
       </div>
 
+      <!-- Delete Modal -->
+    <div class="modal fade" id="deletePrompt" tabindex="-1" aria-labelledby="deleteoModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Are you sure?</h5>
+            <button type="button" id="close-modal" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+
+            <h2>Do you confirm to delete product ID <span id="modalID"></span> ?</h2> 
+            <button type="button" id="yes_del" class="btn btn-danger"> Yes, delete it! </button>
+            <button type="button" id="no_del" class="btn btn-secondary" data-bs-dismiss="modal"> No </button>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
       <canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas>
 
     </main>
   </div>
 </div>
 <script src="<?php base_url('assets/js/bootstrap.bundle.min.js') ?>"></script>
-
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.2/dist/chart.umd.js" integrity="sha384-eI7PSr3L1XLISH8JdDII5YN/njoSsxfbrkCTnJrzXt+ENP5MOVBxD+l6sEG4zoLp" crossorigin="anonymous"></script>
     <script src="<?php base_url('assets/js/dashboard.js') ?>"></script>
