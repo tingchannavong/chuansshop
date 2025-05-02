@@ -487,4 +487,33 @@ class Products extends CI_Controller {
         }
     }  
 
+    public function mod($entity, $id) {
+
+        $table = $this->resolve_table($entity);
+        $record = $this->Product_model->find_record_by_id($table, 'id', $id);
+
+        if (!$record) show_404();
+
+        if ($_POST) {
+            $data = $this->input->post();
+            $this->Product_model->update($table, $data, 'id', $id);
+            redirect("products/display{$entity}s");
+        }
+        $this->load->view("products/edit_{$entity}", ['record' => $record]);
+
+    }
+
+    private function resolve_table($entity) {
+        $map = [
+            'name' => 'product',
+            'brand' => 'brands',
+            'category' => 'categories',
+            'size' => 'sizes',
+            'color' => 'colors',
+            'user' => 'users'
+        ];
+
+        return isset($map[$entity]) ? $map[$entity] : show_404();
+    }
+
 }
