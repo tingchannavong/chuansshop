@@ -505,7 +505,7 @@ class Products extends CI_Controller {
 
     private function resolve_table($entity) {
         $map = [
-            'name' => 'product',
+            'productname' => 'product',
             'brand' => 'brands',
             'category' => 'categories',
             'size' => 'sizes',
@@ -514,6 +514,17 @@ class Products extends CI_Controller {
         ];
 
         return isset($map[$entity]) ? $map[$entity] : show_404();
+    }
+
+    public function del($entity, $id) {
+        $table = $this->resolve_table($entity);
+        $deleted = $this->Product_model->delete($table, 'id', $id);
+
+        if (!$deleted) {
+            echo json_encode(['success' => false]);
+        } else {
+            echo json_encode(['success' => true]);
+        }
     }
 
 }
