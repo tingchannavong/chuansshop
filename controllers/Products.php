@@ -447,7 +447,7 @@ class Products extends CI_Controller {
         $table = "evo_products";
         $ref = "barcode";
         $id = $this->input->post('barcode');
-        // $id = $_POST['barcode'];
+        // $id = $_POST['barcode']; same as above
 
         // Insert data using the model
         if ($this->Product_model->update($table, $data, $ref, $id)) {
@@ -494,11 +494,6 @@ class Products extends CI_Controller {
 
         if (!$record) show_404();
 
-        if ($_POST) {
-            $data = $this->input->post();
-            $this->Product_model->update($table, $data, 'id', $id);
-            redirect("products/display{$entity}s");
-        }
         $this->load->view("products/edit_{$entity}", ['record' => $record]);
 
     }
@@ -525,6 +520,87 @@ class Products extends CI_Controller {
         } else {
             echo json_encode(['success' => true]);
         }
+    }
+
+    public function upd($entity) {
+
+        $table = $this->resolve_table($entity);
+        $id = $this->input->post('id');
+
+        // Validation rules based on entity
+        $this->set_validation_rules($entity);
+
+        if ($this->form_validation->run() === FALSE) {
+            $errors = $this->get_validation_errors($entity);
+            echo json_encode($errors);
+            return;
+        } 
+
+        // Prepare data taken from ajax this form.serialize
+        $data = array(
+            'id' => $this->input->post('id'),
+            'product_name' => $this->input->post('product_name'),
+        );
+
+        // Insert data using the model
+        if ($this->Product_model->update($table, $data, 'id', $id)) {
+            echo json_encode([
+                'status' => 'success',
+                'message' => 'Form submitted successfully!'
+            ]);
+        } else {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Update failed!'
+            ]);
+        }
+    }  
+    
+
+    private function set_validation_rules($entity) {
+        switch ($entity) {
+            case 'category':
+                $this->form_validation->set_rules('cat_name', 'Category Name', 'required');
+                $this->form_validation->set_rules('cat_id', 'ID', 'required');
+                break;
+            case 'size':
+                $this->form_validation->set_rules('size_name', 'Size Name', 'required');
+                 $this->form_validation->set_rules('size_id', 'ID', 'required');
+                 break;
+            case 'color':
+                 $this->form_validation->set_rules('color_name', 'Color Name', 'required');
+                 $this->form_validation->set_rules('color_id', 'ID', 'required');
+                 break;
+            case 'productname':
+                $this->form_validation->set_rules('product_name', 'Product Name', 'required');
+                 $this->form_validation->set_rules('product_id', 'ID', 'required');
+                break;
+            case 'item':
+                $this->form_validation->set_rules('barcode', 'barcode', 'required|min_length[2]');
+                $this->form_validation->set_rules('name_id', 'name', 'required');
+                $this->form_validation->set_rules('cost', 'cost', 'required');
+                $this->form_validation->set_rules('price', 'price', 'required');
+                break;
+            case 'brand':
+                $this->form_validation->set_rules('brand_name', 'Brand Name', 'required');
+                $this->form_validation->set_rules('brand_id', 'ID', 'required');
+                break;
+    
+            // Add more entities as needed
+        }
+    }
+
+    private function get_validation_errors($entity) {
+        $error = ['error' => true];
+    
+        switch ($entity) {
+            case 'productname':
+                $error['name_error'] = form_error('product_name');
+                break;
+            // Add other cases as needed
+        }
+    
+        return $error;
     }
 
 }
