@@ -21,8 +21,7 @@ class Products extends CI_Controller {
     // Function to process form data and insert into the database
     public function category_submit() {
         // Set form validation rules
-        $this->form_validation->set_rules('cat_name', 'Category Name', 'required');
-        $this->form_validation->set_rules('cat_id', 'ID', 'required');
+        $this->set_validation_rules('category');
 
         if ($this->form_validation->run() == FALSE) {
             // Reload the form with validation errors
@@ -62,8 +61,7 @@ class Products extends CI_Controller {
 
     public function size_submit() {
         // Set form validation rules
-        $this->form_validation->set_rules('size_name', 'Size Name', 'required');
-        $this->form_validation->set_rules('size_id', 'ID', 'required');
+        $this->set_validation_rules('size');
 
         if ($this->form_validation->run() == FALSE) {
             // Reload the form with validation errors
@@ -107,14 +105,14 @@ class Products extends CI_Controller {
     // Function to process form data and insert into the database
     public function color_submit() {
         // Set form validation rules
-        $this->form_validation->set_rules('color_name', 'Color Name', 'required');
-        $this->form_validation->set_rules('color_id', 'ID', 'required');
+        $this->set_validation_rules('color');
 
         if ($this->form_validation->run() == FALSE) {
             // Reload the form with validation errors
             $data['title'] = 'Add New';
+            $result['header'] = 'New Color';
             $this->load->view('layouts/header', $data);
-            $this->load->view('add_color');
+            $this->load->view('products/add_color', $result);
         } else {
             // Prepare data to insert into the database
             $data = array(
@@ -150,8 +148,7 @@ class Products extends CI_Controller {
 
     public function brand_submit() {
         // Set form validation rules
-        $this->form_validation->set_rules('brand_name', 'Brand Name', 'required');
-        $this->form_validation->set_rules('brand_id', 'ID', 'required');
+        $this->set_validation_rules('brand');
 
         if ($this->form_validation->run() == FALSE) {
             // Reload the form with validation errors
@@ -196,8 +193,7 @@ class Products extends CI_Controller {
 
     public function name_submit() {
         // Set form validation rules
-        $this->form_validation->set_rules('product_name', 'Product Name', 'required');
-        $this->form_validation->set_rules('product_id', 'ID', 'required');
+        $this->set_validation_rules('productname');
 
         if ($this->form_validation->run() == FALSE) {
             // Reload the form with validation errors
@@ -246,21 +242,13 @@ class Products extends CI_Controller {
 
     public function item_submit() {
         // Set form validation rules
-        $this->form_validation->set_rules('barcode', 'barcode', 'required|min_length[2]');
-        $this->form_validation->set_rules('name_id', 'name', 'required');
-        $this->form_validation->set_rules('cost', 'cost', 'required');
-        $this->form_validation->set_rules('price', 'price', 'required');
+        $this->set_validation_rules('item');
     
         if ($this->form_validation->run() == FALSE) {
             // return validation errors in json format
-            $array = array(
-                'error' => true,
-                'name_error' => form_error('name_id'),
-                'barcode_error' => form_error('barcode'),
-                'cost_error' => form_error('cost'),
-                'price_error' => form_error('price'),
-            );
-            echo json_encode($array);
+
+            $errors = $this->get_validation_errors('item');
+            echo json_encode($errors);
             return;
         }
     
@@ -347,12 +335,7 @@ class Products extends CI_Controller {
 
     public function variant_submit() {
         // Set form validation rules
-        $this->form_validation->set_rules('var_id', 'Variant ID', 'required');
-        $this->form_validation->set_rules('barcode', 'Barcode', 'required');
-        $this->form_validation->set_rules('size', 'size', 'required');
-        $this->form_validation->set_rules('color', 'color', 'required');
-        $this->form_validation->set_rules('quantity', 'quantity', 'required');
-
+        $this->set_validation_rules('variant');
 
         if ($this->form_validation->run() == FALSE) {
             // Reload the form with validation errors
@@ -498,19 +481,6 @@ class Products extends CI_Controller {
 
     }
 
-    private function resolve_table($entity) {
-        $map = [
-            'productname' => 'product',
-            'brand' => 'brands',
-            'category' => 'categories',
-            'size' => 'sizes',
-            'color' => 'colors',
-            'user' => 'users'
-        ];
-
-        return isset($map[$entity]) ? $map[$entity] : show_404();
-    }
-
     public function del($entity, $id) {
         $table = $this->resolve_table($entity);
         $deleted = $this->Product_model->delete($table, 'id', $id);
@@ -556,6 +526,19 @@ class Products extends CI_Controller {
         }
     }  
     
+    private function resolve_table($entity) {
+        $map = [
+            'productname' => 'product',
+            'brand' => 'brands',
+            'category' => 'categories',
+            'size' => 'sizes',
+            'color' => 'colors',
+            'user' => 'users'
+            // add other tables as needed
+        ];
+
+        return isset($map[$entity]) ? $map[$entity] : show_404();
+    }
 
     private function set_validation_rules($entity) {
         switch ($entity) {
@@ -585,6 +568,13 @@ class Products extends CI_Controller {
                 $this->form_validation->set_rules('brand_name', 'Brand Name', 'required');
                 $this->form_validation->set_rules('brand_id', 'ID', 'required');
                 break;
+            case 'variant':
+                $this->form_validation->set_rules('var_id', 'Variant ID', 'required');
+                $this->form_validation->set_rules('barcode', 'Barcode', 'required');
+                $this->form_validation->set_rules('size', 'size', 'required');
+                $this->form_validation->set_rules('color', 'color', 'required');
+                $this->form_validation->set_rules('quantity', 'quantity', 'required');
+                break;
     
             // Add more entities as needed
         }
@@ -597,6 +587,13 @@ class Products extends CI_Controller {
             case 'productname':
                 $error['name_error'] = form_error('product_name');
                 break;
+            case 'item':
+                $error['name_error'] = form_error('name_id');
+                $error['barcode_error'] = form_error('barcode');
+                $error['cost_error'] = form_error('cost');
+                $error['price_error'] = form_error('price');
+                break;
+                
             // Add other cases as needed
         }
     
