@@ -20,8 +20,8 @@
 
 <!-- Pass link as api url to external js file -->
 <script>
-  const DEL_URL = "<?= base_url('products/delete'); ?>";
-  const EDIT_URL = "<?php echo site_url('products/mod/name/'); ?>";
+  const DEL_URL = "<?= base_url('products/del/productname/'); ?>";
+  const EDIT_URL = "<?php echo site_url('products/mod/productname/'); ?>";
 </script>
 
 <!-- Link to external js file !! -->
